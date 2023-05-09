@@ -49,6 +49,7 @@ module system(
     output EX_non_align_word,
     output [7:0] EX_status_out,
     output [3:0]  EX_alu_control,
+    output [31:0] EX_b_operand, EX_a_operand,
 
 
     //MEMORY stage
@@ -77,7 +78,7 @@ module system(
     output D_stall, //biến dùng chỉ để nên stall ở Decode stage hay không
 
     //exception detection
-    output [2:0] D_exception_signal, MEM_exception_signal, WB_exception_signal
+    output [2:0] D_exception_signal, MEM_exception_signal, WB_exception_signal, EX_exception_signal
     //khối theo thầy yêu cầu
 );
 
@@ -178,7 +179,9 @@ module system(
         .EX_PC                  (EX_PC),
         .EX_non_align_word      (EX_non_align_word),
         .status_out             (EX_status_out),
-        .alu_control            (EX_alu_control)
+        .alu_control            (EX_alu_control),
+        .ALUSRC                 (EX_b_operand),
+        .rs                     (EX_a_operand)
     );
 
     memory_stage MEM  (//INPUT
@@ -407,7 +410,9 @@ module execution_stage (
     output reg [4:0]  EX_write_register,  //để sử dụng ở WB
     output [7:0] status_out,
     output [3:0] alu_control,
-    output [31:0] ALUSRC
+
+    output [31:0] ALUSRC,
+    output [31:0] rs
 );
     reg [2:0]  pre_exception_signal;    //dùng để giữ tín hiệu exception ở câu lệnh trước, nhưng không phải thứ sẽ xuất ra
     reg [31:0] EX_instruction;
@@ -452,7 +457,7 @@ module execution_stage (
     assign ALUSRC[31:0] = (EX_control_signal[2])       ? EX_Out_SignedExtended[31:0] : 
                           (MEM_to_EX_forwardSignal[0]) ? MEM_ALUresult               : EX_operand2[31:0];
 
-    wire [31:0] rs;
+    
     assign rs = (MEM_to_EX_forwardSignal[1] ) ?  MEM_ALUresult :  EX_operand1;//decide to forward
 
     ALU         alu1 (//INPUT
