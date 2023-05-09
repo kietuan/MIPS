@@ -17,7 +17,8 @@ module system(
     
     output CLK_led,
     output[26:0] SYS_leds,
-
+    input [31:0] testt_reg_add,
+    output[31:0] testt_reg,
     //---------------------------------------------------------------------
     //chi de test
     //khi chay that, sua tat ca thanh output, reg, xoa output di
@@ -151,7 +152,9 @@ module system(
         .D_Out_SignedExtended  (D_Out_SignedExtended),
         .D_PC                  (D_PC),
         .branch_taken          (branch_taken),
-        .D_exception_signal    (D_exception_signal)
+        .D_exception_signal    (D_exception_signal),
+        .testt_reg_add(testt_reg_add),
+        .testt_reg(testt_reg)
     );
 
     execution_stage EX(//INPUT
@@ -309,8 +312,9 @@ module decode_stage (
     output     [31:0] D_Out_SignedExtended,
     output reg [7:0]  D_PC,
     output            branch_taken,
-    output     [2:0]  D_exception_signal
-
+    output     [2:0]  D_exception_signal,
+    input [31:0]   testt_reg_add,
+    output [31:0]   testt_reg
 
 );
     reg  [31:0] D_instruction;    //lưu giữ instruction để handle được hazard, đây là tín hiệu được ban đầu nhưng output là thứ dã qua ch�?n l�?c
@@ -368,7 +372,9 @@ module decode_stage (
                  
                  //OUTPUT
                  .REG_data_out1   (operand1), //giá trị rs đ�?c được để đưa vào tính toán
-                 .REG_data_out2   (operand2) //giá trị rt đ�?c được để đưa vào tính toán
+                 .REG_data_out2   (operand2), //giá trị rt đ�?c được để đưa vào tính toán
+                 .testt_reg_add(testt_reg_add),
+                 .testt_reg(testt_reg)
                  );
     
     assign D_REG_data_out1 = (MEM_to_D_forwardSignal[1]) ? MEM_ALUresult : operand1;    //choose betwwen forward from MEM or not
