@@ -13,69 +13,86 @@
 module system(
     input   SYS_clk,
     input   SYS_reset,
-    input [2:0]  SYS_output_sel, //trong �'�? l�  7 bit nhưng chỉ cần 3 bit l�  �'ủ hiện thực
+    input [2:0]  SYS_output_sel, //trong �'�? l�  7 bit nhưng chỉ cần 3 bit l�  �'ủ hiện thực
+    
     output CLK_led,
-    output[26:0] SYS_leds
-);
-    assign CLK_led = SYS_clk;
-    reg       SYS_load;
-    reg [7:0]  SYS_pc_val;
+    output[26:0] SYS_leds,
+
+    //---------------------------------------------------------------------
+    //chi de test
+    //khi chay that, sua tat ca thanh output, reg, xoa output di
+    output reg       SYS_load,
+    output reg [7:0]  SYS_pc_val,
     //FETCH stage OK
-    wire [7:0] PC;
-    wire [31:0] F_instruction;
+    output [7:0] PC,
+    output [31:0] F_instruction,
 
     //DECODE stage
-    wire [31:0] D_instruction;          //OK, fixed
-    wire [31:0] D_REG_data_out1;        //chưa biết đúng sai, tạm th�?i là đúng
-    wire [31:0] D_REG_data_out2;        //chưa biết đúng sai, tạm th�?i là đúng    
-    wire [4:0]  D_write_register;       //OK, đúng cho cả addi và lw
-    wire [31:0] D_Out_SignedExtended;   //tạm th�?i ok, trong trư�?ng hợp đơn giản
-    wire [10:0] D_control_signal;       //OK
-    wire        D_isEqual_onBranch;     //tín hiệu so sánh 2 hạng tử của branch ở decode stage
-    wire [ 7:0] D_PC;
-    wire        branch_taken;
-    wire        D_jump_signal;
+    output [31:0] D_instruction,          //OK, fixed
+    output [31:0] D_REG_data_out1,        //chưa biết đúng sai, tạm th�?i là đúng
+    output [31:0] D_REG_data_out2,        //chưa biết đúng sai, tạm th�?i là đúng    
+    output [4:0]  D_write_register,       //OK, đúng cho cả addi và lw
+    output [31:0] D_Out_SignedExtended,   //tạm th�?i ok, trong trư�?ng hợp đơn giản
+    output [10:0] D_control_signal,       //OK
+    output        D_isEqual_onBranch,     //tín hiệu so sánh 2 hạng tử của branch ở decode stage
+    output [ 7:0] D_PC,
+    output        branch_taken,
+    output        D_jump_signal,
     
     //EXECUTION stage
-    wire [31:0] EX_instruction;     //OK
-    wire [4:0]  EX_write_register;  //OK
-    wire [10:0] EX_control_signal;  //OK, như đặc tả
-    wire [31:0] EX_ALUresult;       //OK   
-    wire [31:0] EX_operand2;
-    wire [ 7:0] EX_PC;
-    wire EX_non_align_word;
-    wire [7:0] EX_status_out;
-    wire [3:0]  EX_alu_control;
+    output [31:0] EX_instruction,     //OK
+    output [4:0]  EX_write_register,  //OK
+    output [10:0] EX_control_signal,  //OK, như đặc tả
+    output [31:0] EX_ALUresult,       //OK   
+    output [31:0] EX_operand2,
+    output [ 7:0] EX_PC,
+    output EX_non_align_word,
+    output [7:0] EX_status_out,
+    output [3:0]  EX_alu_control,
 
 
     //MEMORY stage
-    wire [10:0] MEM_control_signal; //ok
-    wire [31:0] MEM_ALUresult;      //OK
-    wire [31:0] MEM_read_data;      //OK
-    wire [4:0]  MEM_write_register; //OK
-    wire [31:0] MEM_instruction;    //OK, 
-    wire [ 7:0] MEM_PC;
+    output [10:0] MEM_control_signal, //ok
+    output [31:0] MEM_ALUresult,      //OK
+    output [31:0] MEM_read_data,      //OK
+    output [4:0]  MEM_write_register, //OK
+    output [31:0] MEM_instruction,    //OK, 
+    output [ 7:0] MEM_PC,
 
     //Write Back stage
-    wire        WB_RegWrite_signal;
-    wire [4:0]  WB_write_register;
-    wire [31:0] WB_write_data;
-    wire [31:0] WB_instruction;
-    wire [ 7:0] WB_PC;
+    output        WB_RegWrite_signal,
+    output [4:0]  WB_write_register,
+    output [31:0] WB_write_data,
+    output [31:0] WB_instruction,
+    output [ 7:0] WB_PC,
 
     //for exception
-    wire [ 7:0] EPC;
-    wire interrupt_signal;
+    output [ 7:0] EPC,
+    output interrupt_signal,
 
     //data hazard
-    wire [1:0] MEM_to_D_forwardSignal;
-    wire [1:0] MEM_to_EX_forwardSignal;
+    output [1:0] MEM_to_D_forwardSignal,
+    output [1:0] MEM_to_EX_forwardSignal,
 
-    wire D_stall; //biến dùng chỉ để nên stall ở Decode stage hay không
+    output D_stall, //biến dùng chỉ để nên stall ở Decode stage hay không
 
     //exception detection
-    wire [2:0] D_exception_signal, EX_exception_signal, MEM_exception_signal, WB_exception_signal;
+    output [2:0] D_exception_signal, MEM_exception_signal, WB_exception_signal
+    //khối theo thầy yêu cầu
+);
 
+
+    assign CLK_led = SYS_clk;
+
+    assign SYS_leds =   (SYS_reset)           ? 0                       :
+                        (SYS_output_sel == 0) ? F_instruction           :
+                        (SYS_output_sel == 1) ? EX_exception_signal     :
+                        (SYS_output_sel == 2) ? EX_instruction            :
+                        (SYS_output_sel == 3) ? D_instruction  :
+                        (SYS_output_sel == 4) ? MEM_instruction           :
+                        (SYS_output_sel == 5) ? WB_instruction:
+                        (SYS_output_sel == 6) ? EX_alu_control          :
+                        (SYS_output_sel == 7) ? {PC, EPC}               : {27{1'b0}}; //cần bổ sung trư�?ng hợp không có gì
     dependency_detection dependency_unit(
         //INPUT
         .D_instruction  (D_instruction),
@@ -216,16 +233,7 @@ module system(
         .interrupt_signal       (interrupt_signal)
     );
 
-    //khối theo thầy yêu cầu
-    assign SYS_leds =   (SYS_reset)           ? 0                       :
-                        (SYS_output_sel == 0) ? F_instruction           :
-                        (SYS_output_sel == 1) ? D_REG_data_out1         :
-                        (SYS_output_sel == 2) ? EX_ALUresult            :
-                        (SYS_output_sel == 3) ? {19'b0, EX_status_out}  :
-                        (SYS_output_sel == 4) ? MEM_read_data           :
-                        (SYS_output_sel == 5) ? {16'b0,D_control_signal}:
-                        (SYS_output_sel == 6) ? EX_alu_control          :
-                        (SYS_output_sel == 7) ? {PC, EPC}               : {27{1'b0}}; //cần bổ sung trư�?ng hợp không có gì
+
 endmodule
 
 module fetch_stage(
