@@ -14,10 +14,10 @@ module system(
     input   SYS_clk,
     input   SYS_reset,
     input [2:0]  SYS_output_sel, //trong Ä'ï¿½? lÃ  7 bit nhÆ°ng chá»‰ cáº§n 3 bit lÃ  Ä'á»§ hiá»‡n thá»±c
-    
+    output CLK_led,
     output[26:0] SYS_leds
 );
-
+    assign CLK_led = SYS_clk;
     reg       SYS_load;
     reg [7:0]  SYS_pc_val;
     //FETCH stage OK
