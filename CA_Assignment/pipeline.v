@@ -71,6 +71,7 @@ module system(
     //for exception
     output [ 7:0] EPC,
     output interrupt_signal,
+    output [7:0] commit_PC,
 
     //data hazard
     output [1:0] MEM_to_D_forwardSignal,
@@ -205,7 +206,8 @@ module system(
             .MEM_read_data      (MEM_read_data),
             .MEM_write_register (MEM_write_register),
      .MEM_exception_instruction (MEM_instruction),
-           .MEM_exception_signal(MEM_exception_signal)
+           .MEM_exception_signal(MEM_exception_signal),
+           .MEM_PC              (MEM_PC)
     );
 
     WB_stage WB (//INPUT
@@ -236,6 +238,7 @@ module system(
         .WB_PC                  (WB_PC),
         //OUTPUT
         .EPC                    (EPC),
+        .commit_PC              (commit_PC),
         .interrupt_signal       (interrupt_signal)
     );
 
@@ -628,12 +631,11 @@ module exception_handle(
     input             SYS_reset,
     input      [2:0]  WB_exception_signal,
     input      [ 7:0] WB_PC,
-
+    output reg [7:0] commit_PC,
     output  [ 7:0] EPC,
     output         interrupt_signal
 );
     reg [2:0] exception_signal;
-    reg [7:0] commit_PC;
 
     always @(posedge SYS_clk, posedge SYS_reset)
     begin
@@ -649,7 +651,7 @@ module exception_handle(
             commit_PC        <= WB_PC;
         end
 
-        else
+        else //if (interrupt_signal) if there is old exception signal
         begin
             exception_signal <= exception_signal;
             commit_PC        <= commit_PC;
