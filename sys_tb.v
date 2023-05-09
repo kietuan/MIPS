@@ -59,7 +59,7 @@ module sys_tb();
     initial
         begin
              //ki?m tra gi? tr? thanh ghi s? 8
-            testt_reg_add = 16;
+            testt_reg_add = 9;
             SYS_reset = 0;
             SYS_output_sel = 2;
             #1 SYS_reset = 1;
