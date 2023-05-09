@@ -42,7 +42,7 @@ output[31:0] DMEM_data_out
             for(i = 0; i<256; i=i+1)
                 data[i] = 0;
             //$readmemh("C:/Users/tuankiet/Desktop/MIPS CPU/input_data.txt", data);
-            $readmemh("C:\\Users\\HP\\Desktop\\CA_BTL\\CA_Assignment\\input_data.txt", data);
+            $readmemh("C:/Users/tuankiet/Desktop/MIPS CPU/CA_Assignment/input_data.txt", data);
         end
 
         else
