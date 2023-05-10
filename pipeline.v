@@ -61,6 +61,7 @@ module system(
     output [4:0]  MEM_write_register, //OK
     output [31:0] MEM_instruction,    //OK, 
     output [ 7:0] MEM_PC,
+    output [31:0] MEM_write_data,    // fortest
 
     //Write Back stage
     output        WB_RegWrite_signal,
@@ -209,6 +210,7 @@ module system(
             .MEM_write_register (MEM_write_register),
      .MEM_exception_instruction (MEM_instruction),
            .MEM_exception_signal(MEM_exception_signal),
+           .MEM_write_data      (MEM_write_data),
            .MEM_PC              (MEM_PC)
     );
 
@@ -512,11 +514,12 @@ module memory_stage (
     output reg [31:0] MEM_ALUresult,
     output     [31:0] MEM_read_data,
     output reg [4:0]  MEM_write_register,
-    output     [31:0] MEM_exception_instruction
+    output     [31:0] MEM_exception_instruction,
+    output reg [31:0] MEM_write_data //fortest
 );
     reg [10:0] MEM_control_signal;
     reg [31:0] MEM_instruction;
-    reg [31:0] MEM_write_data;
+    
 
     reg [2:0]  pre_exception_signal;
     reg        non_align_word;
