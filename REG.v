@@ -44,22 +44,22 @@ module REG(
         if (REG_address1 == REG_address_wr)
         begin
             if (REG_write_enable)
-                REG_data_out1 <= REG_write_data;
+                REG_data_out1 = REG_write_data;
             else
-                REG_data_out1 <= register[REG_address1];
+                REG_data_out1 = register[REG_address1];
         end
         else
-            REG_data_out1 <= register[REG_address1];
+            REG_data_out1 = register[REG_address1];
 
         if (REG_address2 == REG_address_wr)
         begin
             if (REG_write_enable)
-                REG_data_out2 <= REG_write_data;
+                REG_data_out2 = REG_write_data;
             else
-                REG_data_out2 <= register[REG_address2];
+                REG_data_out2 = register[REG_address2];
         end
         else
-            REG_data_out2 <= register[REG_address2];
+            REG_data_out2 = register[REG_address2];
     end
 
 
