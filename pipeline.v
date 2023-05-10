@@ -69,6 +69,7 @@ module system(
     output [31:0] WB_write_data,
     output [31:0] WB_instruction,
     output [ 7:0] WB_PC,
+    output [10:0] WB_control_signal, //for test, not used later
 
     //for exception
     output [ 7:0] EPC,
@@ -231,6 +232,7 @@ module system(
         .WB_RegWrite_signal (WB_RegWrite_signal),   //OK
         .WB_write_register  (WB_write_register),     //ok
         .WB_exception_signal(WB_exception_signal),
+        .WB_control_signal  (WB_control_signal), //for test, not used later
         .WB_PC              (WB_PC)
     );
 
@@ -592,9 +594,9 @@ module WB_stage (
     output            WB_RegWrite_signal,
     output reg [4:0]  WB_write_register,
     output reg [ 7:0] WB_PC,
+    output reg [10:0] WB_control_signal,
     output reg [31:0] WB_instruction
 );
-    reg [10:0] WB_control_signal;
     reg [31:0] WB_read_data;
     reg [31:0] WB_ALUresult;
 
