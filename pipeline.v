@@ -370,8 +370,8 @@ module decode_stage (
                  .clk             (SYS_clk),             //clock này chỉ để write ở WB
                  .SYS_reset       (SYS_reset),
                  .REG_address_wr  (WB_write_register),   //địa chỉ để ghi vào, là rd trong R, rt trong I
-                 .REG_write_1     (WB_RegWrite_signal), //tín hiê ucho phép ghi hay không
-                 .REG_data_wb_in1 (WB_write_data),      //dữ liệu tính toán ra được sắp được ghi vào.
+                 .REG_write_enable(WB_RegWrite_signal), //tín hiê ucho phép ghi hay không
+                 .REG_write_data  (WB_write_data),      //dữ liệu tính toán ra được sắp được ghi vào.
                  //INPUT
                  .REG_address1    (D_instruction[25:21]), //địa chỉ rs
                  .REG_address2    (D_instruction[20:16]), //địa chỉ rt
@@ -380,8 +380,9 @@ module decode_stage (
                  //OUTPUT
                  .REG_data_out1   (operand1), //giá trị rs đ�?c được để đưa vào tính toán
                  .REG_data_out2   (operand2), //giá trị rt đ�?c được để đưa vào tính toán
-                 .testt_reg_add(testt_reg_add),
-                 .testt_reg(testt_reg)
+                 
+                 .testt_reg_add   (testt_reg_add),
+                 .testt_reg       (testt_reg)
                  );
     
     assign D_REG_data_out1 = (MEM_to_D_forwardSignal[1]) ? MEM_ALUresult : operand1;    //choose betwwen forward from MEM or not
