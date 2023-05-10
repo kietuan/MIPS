@@ -132,7 +132,7 @@ module system(
         .SYS_pc_val             (SYS_pc_val),
         //OUTPUT
         .PC                     (PC),
-        .F_instruction          (F_instruction)
+        .F_exception_instruction(F_instruction)
     );
 
     decode_stage decode (//INPUT
@@ -267,10 +267,10 @@ module fetch_stage(
     input       [7:0] SYS_pc_val,
 
     output reg [7:0]  PC,
-    output     [31:0] F_instruction
+    output     [31:0] F_exception_instruction
 );
-
-    always @(negedge SYS_clk, posedge SYS_reset, posedge interrupt_signal)
+    wire     [31:0] F_instruction;
+    always @(negedge SYS_clk)
     begin
         if (SYS_reset || interrupt_signal)
         begin
@@ -296,6 +296,7 @@ module fetch_stage(
 
     IMEM imem (.IMEM_PC(PC), .IMEM_instruction(F_instruction)); //đ�?c lấy lệnh ra
 
+    assign F_exception_instruction = (interrupt_signal) ? 32'b0 : F_instruction;
 endmodule
 
 
@@ -333,7 +334,7 @@ module decode_stage (
     wire        D_isEqual_onBranch;   //tín hiệu so sánh branch sớm được đưa lên decode stage
 
 
-    always @(negedge SYS_clk, posedge SYS_reset, posedge interrupt_signal)
+    always @(negedge SYS_clk)
     begin
         if (SYS_reset || interrupt_signal)
         begin
@@ -395,8 +396,8 @@ module decode_stage (
                                                   (D_instruction[31:26] == 6'h5 && !D_isEqual_onBranch ));
     
     assign D_exception_signal         = (D_control_signal[3]) ? 3'b001 : 3'b0;
-    assign D_exception_instruction    = (D_exception_signal)  ? 32'b0  : D_instruction;       //ch�?n l�?c lại, thứ được đưa ra ngoài là thứ đã được xử lý
-    assign D_exception_control_signal = (D_exception_signal)  ? 32'b0  : D_control_signal;    //ch�?n l�?c lại, thứ được đưa ra ngoài là thứ đã được xử lý
+    assign D_exception_instruction    = (D_exception_signal || interrupt_signal)  ? 32'b0  : D_instruction;       //ch�?n l�?c lại, thứ được đưa ra ngoài là thứ đã được xử lý
+    assign D_exception_control_signal = (D_exception_signal || interrupt_signal)  ? 32'b0  : D_control_signal;    //ch�?n l�?c lại, thứ được đưa ra ngoài là thứ đã được xử lý
 endmodule
 
 
@@ -437,7 +438,7 @@ module execution_stage (
     reg [31:0] EX_operand1;
     reg [31:0] EX_Out_SignedExtended;
 
-    always @(negedge SYS_clk, posedge SYS_reset, posedge interrupt_signal)
+    always @(negedge SYS_clk)
     begin
         if (SYS_reset || D_stall || interrupt_signal)
         begin
@@ -492,8 +493,8 @@ module execution_stage (
     assign EX_exception_signal         = (pre_exception_signal)            ? pre_exception_signal :    //nếu ở trước có thì lấy ở trước
                                          (status_out[2] ||  status_out[6]) ? 3'b010               : 3'b0;
    
-    assign EX_exception_control_signal = (EX_exception_signal) ? 11'b0 : EX_control_signal;
-    assign EX_exception_instruction    = (EX_exception_signal) ? 32'b0 : EX_instruction;            //ch�?n l�?c
+    assign EX_exception_control_signal = (EX_exception_signal || interrupt_signal) ? 11'b0 : EX_control_signal;
+    assign EX_exception_instruction    = (EX_exception_signal || interrupt_signal) ? 32'b0 : EX_instruction;            //ch�?n l�?c
     assign EX_non_align_word           = status_out[3];
 endmodule
 
@@ -527,7 +528,7 @@ module memory_stage (
     reg [2:0]  pre_exception_signal;
     reg        non_align_word;
 
-    always@(negedge SYS_clk, posedge SYS_reset, posedge interrupt_signal)
+    always@(negedge SYS_clk)
     begin
         if (SYS_reset || interrupt_signal)
         begin
@@ -570,8 +571,8 @@ module memory_stage (
     assign MEM_exception_signal = (pre_exception_signal)                     ? pre_exception_signal :
         ((MEM_control_signal[8] || MEM_control_signal[7]) && non_align_word) ? 3'b11                : 3'b0; //nếu như cho phép đ�?c ghi mà gây ra exception thì b�?
 
-    assign MEM_exception_control_signal = (MEM_exception_signal) ? 11'b0 : MEM_control_signal;
-    assign MEM_exception_instruction    = (MEM_exception_signal) ? 32'b0 : MEM_instruction;
+    assign MEM_exception_control_signal = (MEM_exception_signal || interrupt_signal) ? 11'b0 : MEM_control_signal;
+    assign MEM_exception_instruction    = (MEM_exception_signal || interrupt_signal) ? 32'b0 : MEM_instruction;
 
     assign MemRead_signal = MEM_exception_control_signal[8];    //nếu đã cả ra exeption rồi thì không cho phép đ�?c ghi
     assign MemWrite_signal = MEM_exception_control_signal[7];
@@ -602,7 +603,7 @@ module WB_stage (
 
     reg [2:0]  pre_exception_signal;
 
-    always @(negedge SYS_clk, posedge SYS_reset, posedge interrupt_signal)
+    always @(negedge SYS_clk)
     begin
         if (SYS_reset || interrupt_signal)
         begin
@@ -633,7 +634,7 @@ module WB_stage (
     assign WB_exception_signal = (pre_exception_signal)      ? pre_exception_signal :
             (WB_write_register == 0 && WB_control_signal[1]) ? 3'b111               : 3'b000;
 
-    assign WB_RegWrite_signal = (WB_exception_signal)        ? 0 : WB_control_signal[1]; //nếu có exception thì 0 ghi
+    assign WB_RegWrite_signal = (WB_exception_signal || interrupt_signal)        ? 0 : WB_control_signal[1]; //nếu có exception hoac exception cau lenh truoc thì 0 ghi
 endmodule
 
 module exception_handle(
@@ -647,7 +648,7 @@ module exception_handle(
 );
     reg [2:0] exception_signal;
 
-    always @(posedge SYS_clk, posedge SYS_reset)
+    always @(posedge SYS_clk)
     begin
         if (SYS_reset)
         begin
@@ -661,7 +662,7 @@ module exception_handle(
             commit_PC        <= WB_PC;
         end
 
-        else //if (interrupt_signal) if there is old exception signal
+        else if (interrupt_signal) //if there is old exception signal
         begin
             exception_signal <= exception_signal;
             commit_PC        <= commit_PC;

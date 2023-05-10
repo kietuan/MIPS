@@ -63,7 +63,7 @@ module REG(
     end
 
 
-    always @(negedge clk, posedge SYS_reset)
+    always @(negedge clk)
     begin 
         if (SYS_reset)
         begin
