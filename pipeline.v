@@ -94,7 +94,7 @@ module system(
     //khối theo thầy yêu cầu
 
 
-    wire [31:0] testt_reg_add = 8;
+    wire [31:0] testt_reg_add = 9;
 
     assign CLK_led = SYS_clk;
 

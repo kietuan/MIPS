@@ -53,11 +53,16 @@ module sys_tb();
     initial
         begin
              //ki?m tra gi? tr? thanh ghi s? 8
-            SYS_output_sel = 0;
+            SYS_output_sel = 7;
 
             SYS_reset = 0;
             #1 SYS_reset = 1;
             #3 SYS_reset = 0;
+
+            #130 SYS_reset = 1;
+            #3 SYS_reset = 0;
+
+
         end 
     // initial #250 $finish;
 endmodule
