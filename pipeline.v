@@ -9,9 +9,36 @@
 // tràn số                  -> EXE ALU
 // chia cho 0               -> EXE ALU
 
+module freq_divider(
+    input SYS_clk,// SYS_reset,
+    output reg divided_clk
+);
+    parameter divisor = 250_000_000;
+    parameter m = divisor/2;
+    integer count;
+    
+    initial
+    begin
+        count = 0;
+        divided_clk = 0;
+    end
+
+    always @(negedge SYS_clk)
+    begin
+        if (count >= m)
+        begin
+            count        <= 0;
+            divided_clk  <= ~divided_clk;
+        end
+        else count <= count + 1;
+    end
+endmodule
+
+
+    
 
 module system(
-    input   SYS_clk,
+    input   clk,
     input   SYS_reset,
     input [2:0]  SYS_output_sel, //trong �'�? l�  7 bit nhưng chỉ cần 3 bit l�  �'ủ hiện thực
 
@@ -20,6 +47,13 @@ module system(
     output[31:0] testt_reg,
     output [7:0] PC
 );
+    wire SYS_clk;
+    parameter divisor = 1;
+    freq_divider #(.divisor(divisor)) divider(   
+        clk,
+        SYS_clk
+    );
+
     //---------------------------------------------------------------------
     //chi de test
     //khi chay that, sua tat ca thanh output, reg, xoa output di
