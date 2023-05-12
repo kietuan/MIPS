@@ -18,6 +18,7 @@ module system(
     output CLK_led,
     output[26:0] SYS_leds
 );
+    wire [31:0] testt_reg_add = 8;
     wire [31:0] testt_reg;
     wire [7:0] PC;
 
@@ -93,10 +94,6 @@ module system(
     //exception detection
     wire [2:0] D_exception_signal, MEM_exception_signal, WB_exception_signal, EX_exception_signal;
     //khối theo thầy yêu cầu
-
-
-    wire [31:0] testt_reg_add = 9;
-
     assign CLK_led = SYS_clk;
 
     assign SYS_leds =   (SYS_reset)           ? 0                       :
