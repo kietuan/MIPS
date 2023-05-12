@@ -16,12 +16,13 @@ module system(
     input [2:0]  SYS_output_sel, //trong �'�? l�  7 bit nhưng chỉ cần 3 bit l�  �'ủ hiện thực
 
     output CLK_led,
-    output[26:0] SYS_leds,
-    output[31:0] testt_reg,
-    output [7:0] PC
+    output[26:0] SYS_leds
 );
+    wire [31:0] testt_reg;
+    wire [7:0] PC;
+
     wire SYS_clk;
-    parameter divisor = 1;
+    parameter divisor = 250_000_000;
     freq_divider #(.divisor(divisor)) divider(   
         clk,
         SYS_clk
