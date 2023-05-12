@@ -29,10 +29,12 @@ module sys_tb();
     // wire [7:0] F_PC;
 
     wire [26:0] SYS_leds;
+    wire [7:0] PC;
+    wire [31:0] testt_reg;
     //test
    system #(.divisor(1)) sy(
         //INPUT, giữ nguyên
-        .clk                (SYS_clk),
+        .SYS_clk                (SYS_clk),
         .SYS_reset              (SYS_reset),
         .SYS_output_sel         (SYS_output_sel), //trong �'�? l�  7 bit nhưng chỉ cần 3 bit l�  �'ủ hiện thực
 
