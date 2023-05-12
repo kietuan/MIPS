@@ -22,6 +22,7 @@
 
 module sys_tb();
     reg   SYS_clk;
+    wire  CLK_led;
     reg   SYS_reset;
 
     reg [2:0]  SYS_output_sel; //trong �'�? l�  7 bit nhưng chỉ cần 3 bit l�  �'ủ hiện thực
@@ -46,7 +47,7 @@ module sys_tb();
     );
     initial begin
         SYS_clk=0;
-        forever #5 SYS_clk =~ SYS_clk;
+        forever #1 SYS_clk =~ SYS_clk;
 
     end
     initial
@@ -56,7 +57,7 @@ module sys_tb();
 
             SYS_reset = 0;
             #1 SYS_reset = 1;
-            #20 SYS_reset = 0;
+            #3 SYS_reset = 0;
         end 
     // initial #250 $finish;
 endmodule
