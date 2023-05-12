@@ -17,7 +17,6 @@ module system(
     
     output CLK_led,
     output[26:0] SYS_leds,
-    input [31:0] testt_reg_add,
     output[31:0] testt_reg,
     //---------------------------------------------------------------------
     //chi de test
@@ -87,11 +86,12 @@ module system(
     //khối theo thầy yêu cầu
 );
 
+    wire [31:0] testt_reg_add = 8;
 
     assign CLK_led = SYS_clk;
 
     assign SYS_leds =   (SYS_reset)           ? 0                       :
-                        (SYS_output_sel == 0) ? F_instruction           :
+                        (SYS_output_sel == 0) ? testt_reg           :
                         (SYS_output_sel == 1) ? EX_exception_signal     :
                         (SYS_output_sel == 2) ? EX_instruction            :
                         (SYS_output_sel == 3) ? D_instruction  :
