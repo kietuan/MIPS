@@ -22,7 +22,7 @@ module system(
     wire [7:0] PC;
 
     wire SYS_clk;
-    parameter divisor = 250_000_000;
+    parameter divisor = 1;
     freq_divider #(.divisor(divisor)) divider(   
         clk,
         SYS_clk

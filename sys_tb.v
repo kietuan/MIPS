@@ -33,7 +33,7 @@ module sys_tb();
     // wire [7:0] PC;
     // wire [31:0] testt_reg;
     //test
-   system #(.divisor(1)) sy(
+   system sy(
         //INPUT, giữ nguyên
         .clk                   (SYS_clk),
         .SYS_reset              (SYS_reset),
