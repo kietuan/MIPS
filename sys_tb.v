@@ -34,7 +34,7 @@ module sys_tb();
     //test
    system #(.divisor(1)) sy(
         //INPUT, giữ nguyên
-        .SYS_clk                (SYS_clk),
+        .clk                   (SYS_clk),
         .SYS_reset              (SYS_reset),
         .SYS_output_sel         (SYS_output_sel), //trong �'�? l�  7 bit nhưng chỉ cần 3 bit l�  �'ủ hiện thực
 
@@ -56,7 +56,7 @@ module sys_tb();
 
             SYS_reset = 0;
             #1 SYS_reset = 1;
-            #10 SYS_reset = 0;
+            #20 SYS_reset = 0;
         end 
     // initial #250 $finish;
 endmodule
