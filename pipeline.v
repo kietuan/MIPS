@@ -9,33 +9,6 @@
 // tràn số                  -> EXE ALU
 // chia cho 0               -> EXE ALU
 
-module freq_divider(
-    input SYS_clk,// SYS_reset,
-    output reg divided_clk
-);
-    parameter divisor = 250_000_000;
-    parameter m = divisor/2;
-    integer count;
-    
-    initial
-    begin
-        count = 0;
-        divided_clk = 0;
-    end
-
-    always @(negedge SYS_clk)
-    begin
-        if (count >= m)
-        begin
-            count        <= 0;
-            divided_clk  <= ~divided_clk;
-        end
-        else count <= count + 1;
-    end
-endmodule
-
-
-    
 
 module system(
     input   clk,
@@ -1108,3 +1081,32 @@ module forward_detection(
             MEM_to_EX_forwardSignal = 2'b00;
     end
 endmodule
+
+
+module freq_divider(
+    input SYS_clk,// SYS_reset,
+    output reg divided_clk
+);
+    parameter divisor = 250_000_000;
+    parameter m = divisor/2;
+    integer count;
+    
+    initial
+    begin
+        count = 0;
+        divided_clk = 0;
+    end
+
+    always @(negedge SYS_clk)
+    begin
+        if (count >= m)
+        begin
+            count        <= 0;
+            divided_clk  <= ~divided_clk;
+        end
+        else count <= count + 1;
+    end
+endmodule
+
+
+    
