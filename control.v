@@ -21,9 +21,9 @@
 
 
 module control(
-    input [31 :0] instruction, 
-    output reg [10:0] control_signal
-    );
+    input      [31 :0] instruction, 
+    output reg [10:0]  control_signal
+);
     wire [5:0] opcode;
     assign opcode = instruction[31:26];
 
